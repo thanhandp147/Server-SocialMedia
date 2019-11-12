@@ -14,7 +14,7 @@ var cors = require('cors');
 server.set('view engine', 'ejs');
 server.set('views', './views');
 // server.use( express.static('./public/'))
-server.use(express.static(path.resolve(__dirname, './public')));
+server.use(express.static(path.resolve(__dirname, './public/')));
 // server.use(express.static(path.join(__dirname, 'public')));
 server.use(cors());
 
