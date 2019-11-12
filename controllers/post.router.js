@@ -8,20 +8,6 @@ const UPLOAD_CONFIG = require('../utils/multer.config')
 const path = require('path')
 const fs =require('fs')
 
-router.post('/message', async (req, res) => {
-    // const { infoUser }= req.session;
-    // if(!infoUser) res.render('error', { message: `Vui long dang nhap` });
-    // const { _id: authorID }= req.session.infoUser;
-    // const { text }= req.body;
-    // let newPost= new POST_MODEL({ author: authorID, content: text });
-    // let infoAfterInserted= await newPost.save();
-    // res.redirect('/user')
-    const { data } = req.body;
-    console.log(data);
-    res.send({ data })
-
-})
-
 router.route('/posts')
     .get(async (req, res) => {
         let Posts = await POST_MODEL.getListPosts();
