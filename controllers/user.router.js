@@ -104,7 +104,7 @@ router.route('/register')
                 to: email, // list of receivers
                 subject: 'Subject of your email', // Subject line
                 // html: `<a>http://localhost:3000/get-token/${token._userId}</a>`// plain text body
-                html: `<a>https://socialnetwork113.herokuapp.com/get-token/${token._userId}</a>`// plain text body
+                html: `<a>https://server-project-1.herokuapp.com/get-token/${token._userId}</a>`// plain text body
             };
             transporter.sendMail(mailOptions, function (err, info) {
                 if (err)
