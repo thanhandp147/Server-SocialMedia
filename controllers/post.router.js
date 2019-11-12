@@ -79,14 +79,14 @@ router.route('/posts/:token')
         // console.log(pathOfAvatar);
         
         let deleted = await POST_MODEL.deletePostByID({ _idPost })
-        // let pathOfAvatar = path.resolve(__dirname, `../public/upload/${deleted.data.images[0]}`);
-        // if(pathOfAvatar!=`${path.resolve(__dirname,`../public/upload/undefined`)}`){
-        //     fs.readFile(pathOfAvatar,(err,data)=>{
-        //         if(data){
-        //             fs.unlinkSync(pathOfAvatar)
-        //         }
-        //     })
-        // }
+        let pathOfAvatar = path.resolve(__dirname, `../public/upload/${deleted.data.images[0]}`);
+        if(pathOfAvatar!=`${path.resolve(__dirname,`../public/upload/undefined`)}`){
+            fs.readFile(pathOfAvatar,(err,data)=>{
+                if(data){
+                    fs.unlinkSync(pathOfAvatar)
+                }
+            })
+        }
         // res.send(deleted)
         
         let listPostAfterDeleted= await POST_MODEL.getListPosts();
