@@ -314,19 +314,7 @@ router.post('/update_avatar', UPLOAD_CONFIG.single('avatar'), async (req, res) =
         username: infoUserVerify.data.username
     })
     
-    
-    // let pathOfAvatar = path.resolve(__dirname, `../public/upload/${infoUserCurr.avatar}`);
-    // if(pathOfAvatar!=`${path.resolve(__dirname,`../public/upload/undefined`)}`){
-    //     fs.readFile(pathOfAvatar,(err,data)=>{
-    //         if(err){
-    //             throw err
-    //         }
-    //         if(data){
-    //             fs.unlinkSync(pathOfAvatar)
-    //         }
-    //     })
-    //     fs.unlinkSync(pathOfAvatar)
-    // }
+
     
     
     let x= await USER_MODEL.findOneAndUpdate(
