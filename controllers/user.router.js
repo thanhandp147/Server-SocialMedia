@@ -3,7 +3,7 @@ const router = express.Router();
 
 
 const { USER_MODEL } = require('../models/user.model');
-const  POST_MODEL  = require('../models/post.model')
+const POST_MODEL = require('../models/post.model')
 const { TOKEN_CONFIRM_MODEL } = require('../models/token.confirm')
 const validateRegisterInput = require('../validation/register.validate');
 const validateLoginInput = require('../validation/login.validate');
@@ -13,11 +13,11 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
 // const fs = require('fs');
-const UPLOAD_CONFIG =require('../utils/multer.config')
-const fs =require('fs')
+const UPLOAD_CONFIG = require('../utils/multer.config')
+const fs = require('fs')
 
 
-router.get('/delete_all_database',async(req, res)=> {
+router.get('/delete_all_database', async (req, res) => {
     await USER_MODEL.remove({})
     await TOKEN_CONFIRM_MODEL.remove({})
     await POST_MODEL.deleteAllPosts()
@@ -26,7 +26,7 @@ router.get('/delete_all_database',async(req, res)=> {
 
 router.get('/get-token/:token_register', async (req, res) => {
     const { token_register } = req.params;
-    console.log(token_register);
+    // console.log(token_register);
 
     let isMatch = await TOKEN_CONFIRM_MODEL.findOne({
         _userId: token_register
@@ -120,8 +120,8 @@ router.route('/register')
 router.route('/login')
     .post(async (req, res) => {
         const data = req.body;
-        console.log(req.body.usernameLogin);
-        
+        // console.log(req.body.usernameLogin);
+
 
 
         const { errors, isValid } = validateLoginInput(data);
@@ -169,8 +169,8 @@ router.route('/login')
         } else {
 
             const { email, fullname, birthday, phone, avatar } = isExistUser;
-            
-            
+
+
 
             let resultExistUsername = {
                 username: isExistUser.username,
@@ -180,10 +180,10 @@ router.route('/login')
             if (signalSignToken.error) return res.json({ error: true, message: 'something wrong' });
             const { token } = signalSignToken;
             // console.log({ token });
-            let listPosts= await POST_MODEL.getListPosts();
+            let listPosts = await POST_MODEL.getListPosts();
             // return res.send(listPosts)
-            
-            
+
+
             return res.send({
                 text: 'login_success',
                 data: {
@@ -213,7 +213,7 @@ router.post('/refresh-page', async (req, res) => {
         const { fullname, email, birthday, phone, avatar } = infoUserDB;
         let signalSignToken = await signPromise(infoUserVerify);
         if (infoUserVerify.error) return res.json({ error: true, message: 'something_wrong' });
-        let listPosts= await POST_MODEL.getListPosts();
+        let listPosts = await POST_MODEL.getListPosts();
         const { token } = signalSignToken;
         return res.json({
             error: false, data: {
@@ -232,7 +232,7 @@ router.post('/refresh-page', async (req, res) => {
 
 router.post('/update_password', async (req, res) => {
     const { password1, password2, token } = req.body;
-    console.log(password1, password2);
+
 
     let infoUserVerify = await verifyPromise(token);
 
@@ -279,10 +279,10 @@ router.post('/update_info', async (req, res) => {
     if (phone == '') {
         phone = infoUserCurr.phone
     }
-    console.log({ birthday, phone });
+    // console.log({ birthday, phone });
 
 
-    console.log(infoUserCurr);
+    // console.log(infoUserCurr);
     let infoUserAfterUpdate = await USER_MODEL.findOneAndUpdate(
         { username: infoUserVerify.data.username },
         {
@@ -292,7 +292,7 @@ router.post('/update_info', async (req, res) => {
             }
         }, { new: true }
     )
-    console.log(infoUserAfterUpdate);
+    // console.log(infoUserAfterUpdate);
 
     return res.send({
         flag: 'success',
@@ -305,55 +305,206 @@ router.post('/update_info', async (req, res) => {
 
 
 
-router.post('/update_avatar', UPLOAD_CONFIG.single('avatar'), async (req, res) => {    
-    let originalname= req.file.originalname;
-    
+router.post('/update_avatar', UPLOAD_CONFIG.single('avatar'), async (req, res) => {
+    let originalname = req.file.originalname;
+
     let infoUserVerify = await verifyPromise(req.body.token);
 
     let infoUserCurr = await USER_MODEL.findOne({
         username: infoUserVerify.data.username
     })
-    
-    
-    // let pathOfAvatar = path.resolve(__dirname, `../public/upload/${infoUserCurr.avatar}`);
-    // if(pathOfAvatar!=`${path.resolve(__dirname,`../public/upload/undefined`)}`){
-    //     fs.readFile(pathOfAvatar,(err,data)=>{
-    //         if(err){
-    //             throw err
-    //         }
-    //         if(data){
-    //             fs.unlinkSync(pathOfAvatar)
-    //         }
-    //     })
-    //     fs.unlinkSync(pathOfAvatar)
-    // }
-    
-    
-    let x= await USER_MODEL.findOneAndUpdate(
-        {username: infoUserVerify.data.username},
+
+
+    let pathOfAvatar = path.resolve(__dirname, `../public/upload/${infoUserCurr.avatar}`);
+    if (pathOfAvatar != `${path.resolve(__dirname, `../public/upload/undefined`)}`) {
+        fs.readFile(pathOfAvatar, (err, data) => {
+
+            if (data) {
+                fs.unlinkSync(pathOfAvatar)
+            }
+        })
+
+    }
+
+
+    let x = await USER_MODEL.findOneAndUpdate(
+        { username: infoUserVerify.data.username },
         {
-            $set:{
+            $set: {
                 avatar: req.file.originalname
             }
         }, { new: true }
     )
-    
+
     res.send(originalname)
-    
+
 })
 
-router.get('/get_avatar/:name', async(req, res) => {
+router.get('/get_avatar/:name', async (req, res) => {
     const fileName = req.params.name;
-    console.log(fileName)
+
+
+    // console.log(fileName)
     if (!fileName) {
         return res.send({
             status: false,
             message: 'no filename specified',
         })
     }
-    let pathOfAvatar= path.resolve(__dirname, `../public/upload/${fileName}`);
-    res.sendFile(pathOfAvatar)
+    let pathOfAvatar = path.resolve(__dirname, `../public/upload/${fileName}`);
+    let undefinePath = path.resolve(__dirname, `../public/upload/undefined`)
+
+    if (pathOfAvatar == undefinePath) {
+        return
+    } else {
+        res.sendFile(pathOfAvatar)
+    }
+    // if(pathOfAvatar)
+    // res.sendFile(pathOfAvatar)
+
+})
+
+
+// API FRIENDS
+router.get('/get_all_users/:tokenUserCurr', async (req, res) => {
+    const { tokenUserCurr } = req.params;
+    // console.log({tokenUserCurr});
+
+    let infoUserVerify = await verifyPromise(tokenUserCurr);
+    // console.log({ infoUserVerify });
+
+    if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
+    let listUsers = await USER_MODEL.find({
+        username: { $ne: infoUserVerify.data.username },
+        friends: { $ne: infoUserVerify.data._id },
+        guestsRequest: { $ne: infoUserVerify.data._id },
+        usersRequest: { $ne: infoUserVerify.data._id }
+    })
+    let infoFriendsOfUser = await USER_MODEL.findOne({
+        username: infoUserVerify.data.username
+    }).populate('guestsRequest')
+        .populate('usersRequest')
+        .populate('friends')
+    const { guestsRequest, usersRequest, friends } = infoFriendsOfUser
+
+    res.send({ data: { guestsRequest, usersRequest, friends, listUsers } })
+})
+
+router.post('/request_add_friend', async (req, res) => {
+    const { token, _idReceiver } = req.body;
+    let infoUserVerify = await verifyPromise(token);
+    // console.log({ infoUserVerify });
+
+    if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
+    let _idSender = infoUserVerify.data._id;
+    // console.log({ _idSender, _idReceiver });
+    let infoUserSenderAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idSender, {
+        $addToSet: {
+            usersRequest: _idReceiver
+        }
+    }, { new: true })
+
+    let infoUserReceiverAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idReceiver, {
+        $addToSet: {
+            guestsRequest: _idSender
+        }
+    }, { new: true })
+
+    res.send({ error: false, data: infoUserReceiverAfterUpdated })
+})
+
+// CHinh Sua: Hoan Tac yeu Cau Ket Ban
+router.post('/request_remove_friend', async (req, res) => {
+    const { token, _idReceiver } = req.body;
+    let infoUserVerify = await verifyPromise(token);
+    if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
+    let _idSender = infoUserVerify.data._id;
+
+    let infoUserSenderAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idSender, {
+        $pull: {
+            usersRequest: _idReceiver
+        }
+    }, { new: true })
+
+    let infoUserReceiverAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idReceiver, {
+        $pull: {
+            guestsRequest: _idSender
+        }
+    }, { new: true })
+    res.send({ error: false, data: infoUserReceiverAfterUpdated })
+})
+
+// CHap nhan loi moi ket ban
+router.post('/resolve_friend', async (req, res) => {
+    const { token, _idReceiver } = req.body;
+    let infoUserVerify = await verifyPromise(token);
+    if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
+    let _idSender = infoUserVerify.data._id;
+
     
+    let infoUserSenderAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idSender, {
+        $addToSet: {
+            friends: _idReceiver
+        },
+        $pull: {
+            guestsRequest: _idReceiver
+        }
+    }, { new: true })
+
+    let infoUserReceiverAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idReceiver, {
+        $addToSet: {
+            friends: _idSender
+        },
+        $pull: {
+            usersRequest: _idSender
+        }
+    }, { new: true })
+
+    res.send({ error: false, data: infoUserReceiverAfterUpdated })
+})
+
+// Chinh sua: Khong chap nhan loi moi ket ban
+router.post('/reject_friend', async (req, res) => {
+    const { token, _idReceiver } = req.body;
+    let infoUserVerify = await verifyPromise(token);
+    if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
+    let _idSender = infoUserVerify.data._id;
+
+    let infoUserSenderAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idSender, {
+        $pull: {
+            guestsRequest: _idReceiver
+        }
+    }, { new: true })
+
+    let infoUserReceiverAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idReceiver, {
+        $pull: {
+            usersRequest: _idSender
+        }
+    }, { new: true })
+
+    res.send({ error: false, data: infoUserReceiverAfterUpdated })
+})
+
+// CHinh sua: Huy ban be
+router.post('/un_friend', async (req, res) => {
+    const { token, _idReceiver } = req.body;
+    let infoUserVerify = await verifyPromise(token);
+    if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
+    let _idSender = infoUserVerify.data._id;
+
+    let infoUserSenderAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idSender, {
+        $pull: {
+            friends: _idReceiver
+        }
+    }, { new: true })
+
+    let infoUserReceiverAfterUpdated = await USER_MODEL.findByIdAndUpdate(_idReceiver, {
+        $pull: {
+            friends: _idSender
+        }
+    }, { new: true })
+
+    res.send({ error: false, data:infoUserReceiverAfterUpdated })
 })
 
 exports.USER_ROUTER = router;
