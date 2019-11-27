@@ -15,3 +15,21 @@ bcrypt.compare(plainPass, encryptedPass, (err, result) => {
     if (err) console.error(err);
     console.log(`result - ${result}`)
 })
+
+// const hashPassword = plainPass => {
+//     return new Promise(resolve => {
+//         try {
+//             bcrypt.genSalt(10, (err, salt) => {
+//                 if (err) console.error(err);
+//                 bcrypt.hash(plainPass, salt, (err, encrypted) => {
+//                     if (err) console.error(err);
+//                     return resolve ({error:false, encrypted})
+//                 })
+//             })
+//         } catch (error) {
+//             return resolve({ error: true, message: error.message });
+//         }
+//     })
+// }
+
+// console.log(hashPassword('thisispassword'));

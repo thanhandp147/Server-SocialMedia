@@ -6,7 +6,7 @@ const POST_MODEL = require('../models/post.model');
 const { signPromise, verifyPromise } = require('../utils/jwt')
 const UPLOAD_CONFIG = require('../utils/multer.config')
 const path = require('path')
-const fs =require('fs')
+const fs = require('fs')
 
 router.route('/posts')
     .get(async (req, res) => {
@@ -17,7 +17,6 @@ router.route('/posts')
         let originalName = req.file.originalname;
         let { token, content, hashtag } = req.body;
         console.log(originalName);
-        
         let infoUserVerify = await verifyPromise(token);
         if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
         let { _id: _idUser } = infoUserVerify.data
@@ -26,12 +25,11 @@ router.route('/posts')
         let newPost = await POST_MODEL.insert({ _idUser, content, hashtag, originalName });
         let listPosts = await POST_MODEL.getListPosts();
         res.send(listPosts);
-
     })
 
 router.get('/get_imagePost/:name', async (req, res) => {
     const fileName = req.params.name;
-    
+
     if (!fileName) {
         return res.send({
             status: false,
@@ -54,42 +52,42 @@ router.route('/posts/:token')
     })
     .put(async (req, res) => {
         let { token } = req.params;
-        console.log({token});
-        
+        console.log({ token });
+
         let { _idPost, content, hashtag } = req.body;
-        console.log( { _idPost, content, hashtag });
-        
+        console.log({ _idPost, content, hashtag });
+
         let infoUserVerify = await verifyPromise(token);
         if (!infoUserVerify) return res.json({ error: true, message: 'Something Wrong!' })
         // let { _id: _idAuthor } = infoUserVerify.data;
         let infoPostAfterUpdated = await POST_MODEL.updatePostByID({ _idPost, content, hashtag });
-        let listPostAfterEdit= await POST_MODEL.getListPosts();
+        let listPostAfterEdit = await POST_MODEL.getListPosts();
         res.send(listPostAfterEdit)
     })
     .delete(async (req, res) => {
-        let { token : _idPost } = req.params;
+        let { token: _idPost } = req.params;
         console.log(_idPost);
-        
+
         // let {postID}= req.body;
         // console.log({postID});
-        
+
         // let { _idPost } = req.body;
         // console.log({ _idPost });
         // let pathOfAvatar = path.resolve(__dirname, `../public/upload/${fileName}`);
         // console.log(pathOfAvatar);
-        
+
         let deleted = await POST_MODEL.deletePostByID({ _idPost })
         let pathOfAvatar = path.resolve(__dirname, `../public/upload/${deleted.data.images[0]}`);
-        if(pathOfAvatar!=`${path.resolve(__dirname,`../public/upload/undefined`)}`){
-            fs.readFile(pathOfAvatar,(err,data)=>{
-                if(data){
+        if (pathOfAvatar != `${path.resolve(__dirname, `../public/upload/undefined`)}`) {
+            fs.readFile(pathOfAvatar, (err, data) => {
+                if (data) {
                     fs.unlinkSync(pathOfAvatar)
                 }
             })
         }
         // res.send(deleted)
-        
-        let listPostAfterDeleted= await POST_MODEL.getListPosts();
+
+        let listPostAfterDeleted = await POST_MODEL.getListPosts();
         res.send(listPostAfterDeleted)
     })
 // router.get('/abc/:a/:b',(req, res)=>{
